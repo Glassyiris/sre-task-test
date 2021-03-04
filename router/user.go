@@ -1,35 +1,95 @@
 package router
 
 import (
-	"fmt"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"task-test/logger"
 	"task-test/model"
+	"task-test/utils"
+	"time"
 )
 
-func userLogin(c *gin.Context) {
-	var user model.User
-	if err := c.Bind(&user); err != nil {
-		logger.Info("cannot bind")
-		c.String(http.StatusOK, "Login field")
-	}
-	u, err := user.QueryByEmail()
+var OneDayOfHours = 60 * 60 * 24
 
-	if err != nil {
-		c.String(http.StatusOK, "this account not found")
-		return
+func CreateJwt(c *gin.Context) {
+	user := &model.User{}
+	result := &model.Result{
+		Code:    200,
+		Message: "login access",
+		Data:    nil,
 	}
-
-	if u.Password == user.Password {
-		c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
-			"user": u,
+	if e := c.Bind(&user); e != nil {
+		result.Message = e.Error()
+		result.Code = http.StatusUnauthorized
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"result": result,
 		})
+	}
+	u, _ := user.QueryByEmail()
+	println("user id =>", u.Id)
+	if u.Password == user.Password {
+		expiresTime := time.Now().Unix() + int64(OneDayOfHours)
+		claims := jwt.StandardClaims{
+			Audience:  user.Email,
+			ExpiresAt: expiresTime,
+			Id:        string(u.Id),
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "iris",
+			NotBefore: time.Now().Unix(),
+			Subject:   "login",
+		}
+
+		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+		var jwtSecret = []byte(utils.ConfigF.Jwt.Secret + u.Password)
+		token, err := tokenClaims.SignedString(jwtSecret)
+
+		if err == nil {
+			result.Message = "login access"
+			result.Data = "Bearer " + token
+			result.Code = http.StatusOK
+			c.HTML(result.Code, "userprofile.tmpl", gin.H{
+				"user": u,
+			})
+		} else {
+			result.Message = "login field"
+			result.Code = http.StatusOK
+			c.JSON(result.Code, gin.H{
+				"result": result,
+			})
+		}
 	} else {
-		c.String(http.StatusOK, "Password or email has mistake")
+		result.Message = "login field"
+		result.Code = http.StatusOK
+		c.JSON(result.Code, gin.H{
+			"result": result,
+		})
 	}
 }
+
+//func userLogin(c *gin.Context) {
+//	var user model.User
+//	if err := c.Bind(&user); err != nil {
+//		logger.Info("cannot bind")
+//		c.String(http.StatusOK, "Login field")
+//	}
+//	u, err := user.QueryByEmail()
+//
+//	if err != nil {
+//		c.String(http.StatusOK, "this account not found")
+//		return
+//	}
+//
+//	if u.Password == user.Password {
+//		c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
+//			"user": u,
+//		})
+//	} else {
+//		c.String(http.StatusOK, "Password or email has mistake")
+//	}
+//}
 
 func userRegister(c *gin.Context) {
 	var user model.User
@@ -63,26 +123,29 @@ func useProfileUpdate(c *gin.Context) {
 		})
 		logger.Error("binding error ", err.Error())
 	}
+	re, _ := user.QueryByID()
 	file, e := c.FormFile("avatar")
 	if e != nil {
-		c.HTML(http.StatusOK, "error.tmpl", gin.H{
-			"error": e,
-		})
+		//c.HTML(http.StatusOK, "error.tmpl", gin.H{
+		//	"error": e,
+		//})
 		logger.Error("file upload field", e.Error())
-	}
-	//path := utils.RootPath()
-	path := "/avatar/"
-	fileName := file.Filename
-	e = c.SaveUploadedFile(file, "."+path+fileName)
-	if e != nil {
-		c.HTML(http.StatusOK, "error.tmpl", gin.H{
-			"error": e,
-		})
-		logger.Error("cannot save file", e.Error())
-	}
+		user.Avatar = re.Avatar
+	} else {
+		//path := utils.RootPath()
+		path := "/avatar/"
+		fileName := file.Filename
+		e = c.SaveUploadedFile(file, "."+path+fileName)
+		if e != nil {
+			c.HTML(http.StatusOK, "error.tmpl", gin.H{
+				"error": e,
+			})
+			logger.Error("cannot save file", e.Error())
+		}
 
-	avatarUrl := path + fileName
-	user.Avatar = avatarUrl
+		avatarUrl := "http://127.0.0.1:8080" + path + fileName
+		user.Avatar = avatarUrl
+	}
 	e = user.Update()
 
 	if e != nil {
@@ -93,11 +156,9 @@ func useProfileUpdate(c *gin.Context) {
 	}
 	u, _ := user.QueryByEmail()
 	//fmt.Println(u.Avatar.String)
-	addr := "http://127.0.0.1:8080" + u.Avatar
-	fmt.Println(addr)
+	//fmt.Println(addr)
 	c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
-		"image": addr,
-		"user":  u,
+		"user": u,
 	})
 
 }

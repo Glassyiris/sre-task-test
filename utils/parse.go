@@ -15,6 +15,9 @@ type Config struct {
 	Server struct {
 		Port uint32 `yaml:"port"`
 	}
+	Jwt struct {
+		Secret string `yaml:"secret"`
+	}
 }
 
 func ParseConfig(filepath string) *Config {

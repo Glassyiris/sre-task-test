@@ -13,7 +13,7 @@ func InitRouter() *gin.Engine {
 	r.StaticFS("/avatar", http.Dir("./avatar"))
 	user := r.Group("/user")
 	{
-		user.POST("/login", userLogin)
+		user.POST("/login", CreateJwt)
 		user.POST("/register", userRegister)
 		user.POST("/update", useProfileUpdate)
 		user.GET("/logout", userLogout)

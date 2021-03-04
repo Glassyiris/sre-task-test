@@ -3,3 +3,5 @@ database:
   sqlType: mysql
 server:
   port: 8080
+jwt:
+  secret: limanx
