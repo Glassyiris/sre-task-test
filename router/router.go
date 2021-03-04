@@ -9,9 +9,10 @@ func InitRouter() *gin.Engine {
 	r.Static("/static", "./static")
 	user := r.Group("/user")
 	{
-		user.GET("/login", userLogin)
+		user.POST("/login", userLogin)
 		user.POST("/register", userRegister)
 		user.POST("/update", useProfileUpdate)
+		user.GET("/logout", userLogout)
 	}
 
 	index := r.Group("/")

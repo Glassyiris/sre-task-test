@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-func Login(c *gin.Context) {
-
-}
-
 func Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"title": "just test",

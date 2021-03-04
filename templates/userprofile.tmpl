@@ -1,4 +1,4 @@
-{{template "header"}}
+{{template "head"}}
 <div class="container">
     <div class="row">
         <div class="col-sm">
@@ -25,13 +25,21 @@
                            value="{{ .user.Email }}">
                 </div>
                 <div class="form-group">
-                    <label for="user-password">密码</label>
-                    <input type="password" class="form-control" id="user-password" placeholder="密码" name="password"
-                           value="{{.user.Password}}">
+                    <label for="user-nickname">密码</label>
+                    <input type="text" class="align-self-center" id="user-nickname"
+                           name="password"
+                           readonly
+                           placeholder="Enter Nickname"
+                           value="{{ .user.Password }}">
+                </div>
+                <div class="form-group">
+                    <label for="user-password">NickName</label>
+                    <input type="password" class="form-control" id="user-nickname" placeholder="密码" name="nickname"
+                           value="{{.user.Nickname}}">
                 </div>
                 <div class="form-group">
                     <label for="user-avatar">上传头像</label>
-                    <input type="file" class="form-control-file" id="user-avatar" name="avatar-file">
+                    <input type="file" class="form-control-file" id="user-avatar" name="avatar">
                 </div>
                 <button type="submit" class="btn btn-primary">保存</button>
             </form>
