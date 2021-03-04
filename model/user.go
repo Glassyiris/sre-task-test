@@ -4,20 +4,19 @@ import (
 	"database/sql"
 	"task-test/logger"
 	"task-test/utils"
-	"time"
 )
 
 type User struct {
-	Id        uint           `form:"id" json:"id" xml:"id" gorm:"primaryKey"`
-	Email     string         `form:"email" json:"email" xml:"email" binding:"email"`
-	Password  string         `form:"password" json:"password" xml:"password"`
-	Nickname  string         `form:"nickname" json:"nickname" xml:"nickname"`
-	Avatar    sql.NullString `form:"avatar"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id        uint   `form:"id" json:"id" xml:"id" gorm:"primaryKey"`
+	Email     string `form:"email" json:"email" xml:"email" binding:"email"`
+	Password  string `form:"password" json:"password" xml:"password"`
+	Nickname  string `form:"nickname" json:"nickname" xml:"nickname"`
+	Avatar    sql.NullString
+	CreatedAt int
+	UpdatedAt int
 }
 
-func (u *User) Save() uint {
+func (u *User) Save() (uint, error) {
 	result := utils.Db.AutoMigrate(u)
 	if result != nil {
 		logger.Error(result.Error())
@@ -26,7 +25,7 @@ func (u *User) Save() uint {
 	if r.Error != nil {
 		logger.Error(r.Error.Error())
 	}
-	return u.Id
+	return u.Id, r.Error
 }
 
 func (u *User) QueryByEmail() (User, error) {
@@ -47,8 +46,9 @@ func (u *User) QueryByID(id int64) (User, error) {
 	return user, row.Error
 }
 
-func (u *User) Update(id int64) error {
-	result := utils.Db.Save(u)
+func (u *User) Update() error {
+	r := utils.Db.Model(u).Update("avatar", u.Avatar)
+	r = utils.Db.Model(u).Update("nickname", u.Nickname)
 
-	return result.Error
+	return r.Error
 }

@@ -27,7 +27,6 @@ email VARCHAR(64) NOT NULL COMMENT 'unique id',
 nickname VARCHAR(128) NOT NULL DEFAULT '' COMMENT 'user nickname, can be empty',
 password VARCHAR(32) NOT NULL COMMENT 'md5 result of real password and key',
 avatar VARCHAR(128)  NULL DEFAULT '' COMMENT 'user avatar, can be null',
-uptime int(64) NOT NULL DEFAULT 0 COMMENT 'update time: unix timestamp',
 PRIMARY KEY(id),
 UNIQUE KEY email_unique (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user info table';`
