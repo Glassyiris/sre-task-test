@@ -1,16 +1,12 @@
 package router
 
 import (
-	"database/sql"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 	"task-test/logger"
 	"task-test/model"
-	"task-test/utils"
-	"time"
 )
 
 func userLogin(c *gin.Context) {
@@ -50,6 +46,7 @@ func userRegister(c *gin.Context) {
 	}
 
 	_, err := user.Save()
+
 	if err != nil {
 		c.String(http.StatusOK, "this email already signed")
 		return
@@ -73,36 +70,34 @@ func useProfileUpdate(c *gin.Context) {
 		})
 		logger.Error("file upload field", e.Error())
 	}
-	path := utils.RootPath()
-	path = path + "avatar/"
-	e = os.MkdirAll(path, os.ModePerm)
-	if e != nil {
-		c.HTML(http.StatusOK, "error.tmpl", gin.H{
-			"error": e,
-		})
-		logger.Error("can't create folder", e.Error())
-	}
-	fileName := strconv.FormatInt(time.Now().Unix(), 10) + file.Filename
-	e = c.SaveUploadedFile(file, path+fileName)
+	//path := utils.RootPath()
+	path := "/avatar/"
+	fileName := file.Filename
+	e = c.SaveUploadedFile(file, "."+path+fileName)
 	if e != nil {
 		c.HTML(http.StatusOK, "error.tmpl", gin.H{
 			"error": e,
 		})
 		logger.Error("cannot save file", e.Error())
 	}
-	avatarUrl := "http://localhost:8080/avatar/" + fileName
-	user.Avatar = sql.NullString{String: avatarUrl}
+
+	avatarUrl := path + fileName
+	user.Avatar = avatarUrl
 	e = user.Update()
+
 	if e != nil {
 		c.HTML(http.StatusOK, "error.tmpl", gin.H{
 			"error": e,
 		})
 		log.Panicln("can't update", e.Error())
 	}
-	u, _ := user.QueryByID()
-
+	u, _ := user.QueryByEmail()
+	//fmt.Println(u.Avatar.String)
+	addr := "http://127.0.0.1:8080" + u.Avatar
+	fmt.Println(addr)
 	c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
-		"user": u,
+		"image": addr,
+		"user":  u,
 	})
 
 }

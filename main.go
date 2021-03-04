@@ -7,6 +7,7 @@ import (
 
 func main() {
 	utils.CreateTable()
+	utils.InitPath()
 	route := router.InitRouter()
 	route.Run()
 }

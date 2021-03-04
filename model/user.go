@@ -1,7 +1,6 @@
 package model
 
 import (
-	"database/sql"
 	"task-test/logger"
 	"task-test/utils"
 )
@@ -11,7 +10,7 @@ type User struct {
 	Email     string `form:"email" json:"email" xml:"email" binding:"email"`
 	Password  string `form:"password" json:"password" xml:"password"`
 	Nickname  string `form:"nickname" json:"nickname" xml:"nickname"`
-	Avatar    sql.NullString
+	Avatar    string
 	CreatedAt int
 	UpdatedAt int
 }
@@ -47,8 +46,6 @@ func (u *User) QueryByID() (User, error) {
 }
 
 func (u *User) Update() error {
-	r := utils.Db.Model(u).Update("avatar", u.Avatar)
-	r = utils.Db.Model(u).Update("nickname", u.Nickname)
-
-	return r.Error
+	_, err := u.Save()
+	return err
 }

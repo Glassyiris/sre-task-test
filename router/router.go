@@ -3,7 +3,6 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"task-test/utils"
 )
 
 func InitRouter() *gin.Engine {
@@ -11,7 +10,7 @@ func InitRouter() *gin.Engine {
 	r.LoadHTMLGlob("templates/*")
 	r.StaticFile("/favicon.svg", "./favicon.svg")
 	r.Static("/static", "./static")
-	r.StaticFS("/avatar", http.Dir(utils.RootPath()+"avatar/"))
+	r.StaticFS("/avatar", http.Dir("./avatar"))
 	user := r.Group("/user")
 	{
 		user.POST("/login", userLogin)
