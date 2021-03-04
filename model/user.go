@@ -37,7 +37,7 @@ func (u *User) QueryByEmail() (User, error) {
 	return user, row.Error
 }
 
-func (u *User) QueryByID(id int64) (User, error) {
+func (u *User) QueryByID() (User, error) {
 	var user User
 	row := utils.Db.Where("id = ?", u.Id).Take(&user)
 	if row.Error != nil {

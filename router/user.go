@@ -99,7 +99,12 @@ func useProfileUpdate(c *gin.Context) {
 		})
 		log.Panicln("can't update", e.Error())
 	}
-	//	c.
+	u, _ := user.QueryByID()
+
+	c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
+		"user": u,
+	})
+
 }
 
 func userLogout(c *gin.Context) {
