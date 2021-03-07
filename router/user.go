@@ -43,7 +43,7 @@ func CreateJwt(c *gin.Context) {
 
 		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-		var jwtSecret = []byte(utils.ConfigF.Jwt.Secret + u.Password)
+		var jwtSecret = []byte(utils.Configs.Jwt.Secret + u.Password)
 		token, err := tokenClaims.SignedString(jwtSecret)
 
 		if err == nil {
@@ -68,28 +68,6 @@ func CreateJwt(c *gin.Context) {
 		})
 	}
 }
-
-//func userLogin(c *gin.Context) {
-//	var user model.User
-//	if err := c.Bind(&user); err != nil {
-//		logger.Info("cannot bind")
-//		c.String(http.StatusOK, "Login field")
-//	}
-//	u, err := user.QueryByEmail()
-//
-//	if err != nil {
-//		c.String(http.StatusOK, "this account not found")
-//		return
-//	}
-//
-//	if u.Password == user.Password {
-//		c.HTML(http.StatusOK, "userprofile.tmpl", gin.H{
-//			"user": u,
-//		})
-//	} else {
-//		c.String(http.StatusOK, "Password or email has mistake")
-//	}
-//}
 
 func userRegister(c *gin.Context) {
 	var user model.User

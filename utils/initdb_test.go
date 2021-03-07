@@ -1,7 +1,11 @@
 package utils
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestInitDB(t *testing.T) {
-	initDB()
+	InitDB()
+	fmt.Println(Configs.Database.Dsn)
 }

@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"task-test/middleware"
 )
 
 func InitRouter() *gin.Engine {
@@ -11,7 +12,9 @@ func InitRouter() *gin.Engine {
 	r.StaticFile("/favicon.svg", "./favicon.svg")
 	r.Static("/static", "./static")
 	r.StaticFS("/avatar", http.Dir("./avatar"))
+
 	user := r.Group("/user")
+	user.Use(middleware.Auth())
 	{
 		user.POST("/login", CreateJwt)
 		user.POST("/register", userRegister)
@@ -22,7 +25,6 @@ func InitRouter() *gin.Engine {
 	index := r.Group("/")
 	{
 		index.GET("", Index)
-		index.GET("login", indexLogin)
 		index.GET("register", indexRegister)
 	}
 

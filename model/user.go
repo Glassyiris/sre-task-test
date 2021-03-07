@@ -16,7 +16,7 @@ type User struct {
 }
 
 func (u *User) Save() (uint, error) {
-	result := utils.Db.AutoMigrate(u)
+	result := utils.Db.AutoMigrate(&User{})
 	if result != nil {
 		logger.Error(result.Error())
 	}

@@ -74,7 +74,7 @@ func parseToken(token string) (*jwt.StandardClaims, error) {
 	}
 	jwtToken, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{},
 		func(token *jwt.Token) (i interface{}, e error) {
-			return []byte(utils.ConfigF.Jwt.Secret + u.Password), nil
+			return []byte(utils.Configs.Jwt.Secret + u.Password), nil
 		})
 	if err == nil && jwtToken != nil {
 		if claim, ok := jwtToken.Claims.(*jwt.StandardClaims); ok && jwtToken.Valid {

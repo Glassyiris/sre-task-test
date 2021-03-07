@@ -1,4 +1,4 @@
-//form jixXi Xiao <jiaxi.xiao@shopee.com>
+//form jiaXi Xiao <jiaxi.xiao@shopee.com>
 
 package logger
 

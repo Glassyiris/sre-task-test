@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 )
 
 func TestParseConfig(t *testing.T) {
-	c := ParseConfig("../config/config.yaml")
+	c := ParseConfig()
+
 	fmt.Println(c.Database.Dsn)
 }
