@@ -15,7 +15,7 @@ var secret = "timeToExit"
 
 func InitRouter() *gin.Engine {
 	r := gin.Default()
-	store, err := redis.NewStore(100, "tcp", fmt.Sprintf("%s:%s", utils.Configs.Redis.Addr, utils.Configs.Redis.Port), "", []byte(secret))
+	store, err := redis.NewStore(100, "tcp", fmt.Sprintf("%s:%d", utils.Configs.Redis.Addr, utils.Configs.Redis.Port), "", []byte(secret))
 
 	if err != nil {
 		logger.Error("Redis connect field")
@@ -30,11 +30,10 @@ func InitRouter() *gin.Engine {
 
 	//add the router for user's operation
 	user := r.Group("/user")
-	user.Use(middleware.Auth())
 	{
 		user.POST("/login", CreateJwt)
 		user.POST("/register", userRegister)
-		user.POST("/update", useProfileUpdate)
+		user.POST("/update", middleware.Auth(), useProfileUpdate)
 		user.GET("/logout", userLogout)
 	}
 
