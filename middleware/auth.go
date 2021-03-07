@@ -16,41 +16,41 @@ func Auth() gin.HandlerFunc {
 
 		result := model.Result{
 			Code:    http.StatusUnauthorized,
-			Message: "无法认证，重新登录",
+			Message: "Cannot Authorized",
 			Data:    nil,
 		}
 		auth := context.Request.Header.Get("Authorization")
 
 		if len(auth) == 0 {
 			context.Abort()
-			context.JSON(http.StatusUnauthorized, gin.H{
-				"result": result,
+			context.HTML(result.Code, "error.tmpl", gin.H{
+				"error": result.Message,
 			})
 		}
 
 		auth = strings.Fields(auth)[1]
-		// 校验token
+		// verify token
 		_, err := parseToken(auth)
 		if err != nil {
 			context.Abort()
-			result.Message = "token 过期 " + err.Error()
-			context.JSON(http.StatusUnauthorized, gin.H{
-				"result": result,
+			result.Message = "token expired " + err.Error()
+			context.HTML(result.Code, "error.html", gin.H{
+				"error": result.Message,
 			})
 		} else {
-			println("token 正确")
+			logger.Info("token valid")
 		}
 		context.Next()
 	}
 }
 func parseToken(token string) (*jwt.StandardClaims, error) {
 
-	// 分割出来载体
+	//split
 	payload := strings.Split(token, ".")
 	bytes, e := jwt.DecodeSegment(payload[1])
 
 	if e != nil {
-		println(e.Error())
+		logger.Error(e.Error())
 	}
 	content := ""
 	for i := 0; i < len(bytes); i++ {
@@ -63,7 +63,7 @@ func parseToken(token string) (*jwt.StandardClaims, error) {
 
 	ID, err := strconv.Atoi(i[0])
 	if err != nil {
-		println(err.Error())
+		logger.Error(err.Error())
 	}
 
 	user := model.User{}

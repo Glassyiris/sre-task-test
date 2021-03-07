@@ -16,14 +16,17 @@ type User struct {
 }
 
 func (u *User) Save() (uint, error) {
+	//create table
 	result := utils.Db.AutoMigrate(&User{})
 	if result != nil {
 		logger.Error(result.Error())
 	}
+	//save the user
 	r := utils.Db.Save(u)
 	if r.Error != nil {
 		logger.Error(r.Error.Error())
 	}
+
 	return u.Id, r.Error
 }
 
@@ -33,15 +36,18 @@ func (u *User) QueryByEmail() (User, error) {
 	if row.Error != nil {
 		logger.Error(row.Error.Error())
 	}
+
 	return user, row.Error
 }
 
 func (u *User) QueryByID() (User, error) {
 	var user User
+
 	row := utils.Db.Where("id = ?", u.Id).Take(&user)
 	if row.Error != nil {
 		logger.Error(row.Error.Error())
 	}
+
 	return user, row.Error
 }
 

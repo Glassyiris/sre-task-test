@@ -14,6 +14,9 @@ import (
 var OneDayOfHours = 60 * 60 * 24
 
 func CreateJwt(c *gin.Context) {
+	//session := sessions.Default(c)
+	//
+	//if session.Get("")
 	user := &model.User{}
 	result := &model.Result{
 		Code:    200,
@@ -28,7 +31,7 @@ func CreateJwt(c *gin.Context) {
 		})
 	}
 	u, _ := user.QueryByEmail()
-	println("user id =>", u.Id)
+	//println("user id =>", u.Id)
 	if u.Password == user.Password {
 		expiresTime := time.Now().Unix() + int64(OneDayOfHours)
 		claims := jwt.StandardClaims{
@@ -40,7 +43,6 @@ func CreateJwt(c *gin.Context) {
 			NotBefore: time.Now().Unix(),
 			Subject:   "login",
 		}
-
 		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 		var jwtSecret = []byte(utils.Configs.Jwt.Secret + u.Password)
