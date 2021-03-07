@@ -30,8 +30,10 @@ func (u *User) Save() (uint, error) {
 	return u.Id, r.Error
 }
 
+//query the user by email (unique key)
 func (u *User) QueryByEmail() (User, error) {
 	var user User
+
 	row := utils.Db.Where("email = ?", u.Email).Take(&user)
 	if row.Error != nil {
 		logger.Error(row.Error.Error())
@@ -40,6 +42,7 @@ func (u *User) QueryByEmail() (User, error) {
 	return user, row.Error
 }
 
+//query by prime key
 func (u *User) QueryByID() (User, error) {
 	var user User
 
