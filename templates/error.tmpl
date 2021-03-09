@@ -1,5 +1,14 @@
-{{ template "head"}}
-<div class="alert">
-    <p>Something Wrong</p>
-    <p>{{ .error }}</p>
-</div>
+{{define "err"}}
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script src="/static/layer/layer.js"></script>
+    <script>
+        $(function () {
+            let err = "{{.message}}"
+            if (err !== "") {
+                layer.alert(err)
+            }
+        })
+    </script>
+
+{{end}}

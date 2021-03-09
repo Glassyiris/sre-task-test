@@ -17,8 +17,9 @@ type Config struct {
 		Secret string `yaml:"secret"`
 	}
 	Redis struct {
-		Addr string `yaml:"address"`
-		Port uint32 `yaml:"port"`
+		Addr     string `yaml:"address"`
+		Port     uint32 `yaml:"port"`
+		Password string `yaml:"password"`
 	}
 }
 

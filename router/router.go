@@ -22,6 +22,7 @@ func InitRouter() *gin.Engine {
 	}
 	r.Use(sessions.Sessions("session", store))
 
+	//r.Use(middleware.Auth())
 	//load static resource
 	r.LoadHTMLGlob("templates/*")
 	r.StaticFile("/favicon.svg", "./favicon.svg")
@@ -33,8 +34,9 @@ func InitRouter() *gin.Engine {
 	{
 		user.POST("/login", CreateJwt)
 		user.POST("/register", userRegister)
-		user.POST("/update", middleware.Auth(), useProfileUpdate)
-		user.GET("/logout", userLogout)
+		user.POST("/update",  middleware.Auth(), useProfileUpdate)
+		user.GET("/profile", middleware.Auth(), profile)
+		user.POST("/logout", userLogout)
 	}
 
 	index := r.Group("/")
@@ -45,3 +47,4 @@ func InitRouter() *gin.Engine {
 
 	return r
 }
+

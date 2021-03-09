@@ -16,6 +16,12 @@
                            name="id"
                            value="{{ .user.Id }}">
                 </div>
+                <div class="form-group" hidden>
+                    <label for="user-id">token</label>
+                    <input type="text" id="token"
+                           name="token"
+                           value="{{ .token }}">
+                </div>
                 <div class="form-group">
                     <label for="user-email">Email</label>
                     <input type="email" class="form-control" id="user-email" aria-describedby="emailHelp"
@@ -44,7 +50,15 @@
                 <button type="submit" class="btn btn-primary">Save Changes</button>
             </form>
             <div>
-                <form action="/user/logout" method="get" class="form-button">
+                <div class="form-group" hidden>
+                    <label for="user-email">Email</label>
+                    <input type="email" class="form-control" id="user-email" aria-describedby="emailHelp"
+                           name="email"
+                           readonly
+                           placeholder="Enter email"
+                           value="{{ .user.Email }}">
+                </div>
+                <form action="/user/logout" method="post" class="form-button">
                     <button type="submit" class="btn btn-primary">Logout</button>
                 </form>
             </div>

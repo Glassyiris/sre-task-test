@@ -6,7 +6,7 @@ import (
 )
 
 func TestParseConfig(t *testing.T) {
-	c := ParseConfig()
+	c := ParseConfig("")
 
 	fmt.Println(c.Database.Dsn)
 }
