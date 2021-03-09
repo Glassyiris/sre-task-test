@@ -1,5 +1,5 @@
 database:
-  dsn: root:limanx@tcp(10.129.103.168:3306)/test?charset=utf8mb4&parseTime=True&loc=Local
+  dsn: root:limanx@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local
   sqlType: mysql
 server:
   port: 8080

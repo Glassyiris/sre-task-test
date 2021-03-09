@@ -1,6 +1,7 @@
 package router
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"task-test/cache"
@@ -14,44 +15,25 @@ import (
 
 func CreateJwt(c *gin.Context) {
 	var user model.User
-	err := c.Bind(&user)
-	result := &model.Result{
-		Code:    e.SUCCESS,
-		Message: "Login success",
-		Data:    "",
+	resp := Gin{
+		c,
 	}
+	err := c.BindJSON(&user)
 	if err != nil {
-		result.Code = e.ERROR_AUTH
-		result.Message = "Input valid"
-		c.JSON(result.Code, gin.H{
-			"result": result,
-		})
+		resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "input error", "")
 	}
 	u, err := user.QueryByEmail()
 	if err != nil {
-		result.Code = e.ERROR_AUTH
-		result.Message = "Email or Password wrong"
-		c.JSON(result.Code, gin.H{
-			"res": result,
-		})
+		resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "Can't found email", "")
 	} else {
 		token, err := utils.GenerateToken(u.Email, u.Password)
 		if err != nil {
-			result.Code = e.ERROR_AUTH_CHECK_TOKEN_FAIL
-			result.Message = "Generate token error"
-			c.JSON(result.Code, gin.H{
-				"result": result,
-			})
+			resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "Email or password wrong", "")
 		}
 
 		cache.Set(user.Email, token, 1000)
+		resp.Response(http.StatusOK, e.SUCCESS, "Login Success", token)
 
-		result.Message = "login success"
-		result.Data = token
-		result.Code = e.SUCCESS
-		c.JSON(result.Code, gin.H{
-			"result": result,
-		})
 	}
 }
 
@@ -181,4 +163,15 @@ func profile(c *gin.Context) {
 		})
 	}
 
+}
+
+func test(c *gin.Context) {
+	resp := Gin{
+		c,
+	}
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+
+	fmt.Printf("email: %s -> password: %s", email, password)
+	resp.Response(200, 200, "Ok", "err")
 }

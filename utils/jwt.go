@@ -1,9 +1,10 @@
 package utils
 
 import (
-"time"
+	"fmt"
+	"time"
 
-"github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type Claims struct {
@@ -27,7 +28,11 @@ func GenerateToken(username, password string) (string, error) {
 	}
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(Configs.Jwt.Secret)
+	token, err := tokenClaims.SignedString([]byte(Configs.Jwt.Secret))
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	return token, err
 }
@@ -46,4 +51,3 @@ func ParseToken(token string) (*Claims, error) {
 
 	return nil, err
 }
-

@@ -21,7 +21,6 @@ func InitRouter() *gin.Engine {
 		logger.Error("Redis connect field")
 	}
 	r.Use(sessions.Sessions("session", store))
-
 	//r.Use(middleware.Auth())
 	//load static resource
 	r.LoadHTMLGlob("templates/*")
@@ -34,7 +33,7 @@ func InitRouter() *gin.Engine {
 	{
 		user.POST("/login", CreateJwt)
 		user.POST("/register", userRegister)
-		user.POST("/update",  middleware.Auth(), useProfileUpdate)
+		user.POST("/update", middleware.Auth(), useProfileUpdate)
 		user.GET("/profile", middleware.Auth(), profile)
 		user.POST("/logout", userLogout)
 	}
@@ -43,8 +42,8 @@ func InitRouter() *gin.Engine {
 	{
 		index.GET("", Index)
 		index.GET("register", indexRegister)
+		index.GET("test", test)
 	}
 
 	return r
 }
-

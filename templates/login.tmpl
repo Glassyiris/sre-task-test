@@ -2,7 +2,7 @@
 
 
 <body class="text-center">
-<form class="form-button" action="/user/login" method="post" enctype="application/x-www-form-urlencoded">
+<form class="form-button" id="login" method="post" enctype="application/x-www-form-urlencoded">
     <img class="mb-4" src="/favicon.svg" alt="" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <label for="email" class="sr-only">Email address</label>
@@ -14,7 +14,11 @@
             <input type="checkbox" value="remember-me"> Remember me
         </label>
     </div>
-    <button class="btn-primary btn" type="submit">Sign in</button>
+    <button class="btn-primary btn" onclick=login()>Sign in</button>
     <p class="mt-5 mb-3 text-muted">© within.yang</p>
 </form>
 </body>
+
+<script>
+
+</script>
