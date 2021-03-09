@@ -4,7 +4,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"task-test/config"
 	e "task-test/config"
 	"task-test/utils"
 )
@@ -17,7 +16,7 @@ func Auth() gin.HandlerFunc {
 		code = 200
 		token := c.Query("token")
 		if token == "" {
-			code = config.INVALID_PARAMS
+			code = e.INVALID_PARAMS
 		} else {
 			_, err := utils.ParseToken(token)
 			if err != nil {

@@ -1,80 +1,56 @@
 package router
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"task-test/cache"
+	e "task-test/config"
 	"task-test/logger"
 	"task-test/model"
 	"task-test/utils"
-	"time"
 )
 
 //var ctx = context.Background()
 
-var OneDayOfHours = 60 * 60 * 24
-
-var token string
-
 func CreateJwt(c *gin.Context) {
-	var err error
-	user := &model.User{}
+	var user model.User
+	err := c.Bind(&user)
 	result := &model.Result{
-		Code:    200,
-		Message: "login access",
-		Data:    nil,
+		Code:    e.SUCCESS,
+		Message: "Login success",
+		Data:    "",
 	}
-	if e := c.Bind(&user); e != nil {
-		result.Message = e.Error()
-		result.Code = http.StatusUnauthorized
-		c.HTML(result.Code, "index.tmpl", gin.H{
-			"error": result.Message,
+	if err != nil {
+		result.Code = e.ERROR_AUTH
+		result.Message = "Input valid"
+		c.JSON(result.Code, gin.H{
+			"result": result,
 		})
 	}
-	u, _ := user.QueryByEmail()
-	//println("user id =>", u.Id)
-	if u.Password == user.Password {
-		expiresTime := time.Now().Unix() + int64(OneDayOfHours)
-		claims := jwt.StandardClaims{
-			Audience:  user.Email,
-			ExpiresAt: expiresTime,
-			Id:        string(u.Id),
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "iris",
-			NotBefore: time.Now().Unix(),
-			Subject:   "login",
-		}
-		tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-		var jwtSecret = []byte(utils.Configs.Jwt.Secret + u.Password)
-		token, err = tokenClaims.SignedString(jwtSecret)
-		cache.Set(u.Email, token, 10)
-		c.SetCookie(u.Email, token, 3600, "/", "http://127.0.0.1", false, true)
-		if err != nil {
-			logger.Error(err.Error())
-		}
-
-		if err == nil {
-			result.Message = "login access"
-			result.Data = u.Email + " " + token
-			result.Code = http.StatusOK
-			c.HTML(result.Code, "userprofile.tmpl", gin.H{
-				"token": token,
-				"user":  u,
-			})
-		} else {
-			result.Message = "login field"
-			result.Code = http.StatusOK
-			c.HTML(result.Code, "index.tmpl", gin.H{
-				"massage": result.Message,
-			})
-		}
+	u, err := user.QueryByEmail()
+	if err != nil {
+		result.Code = e.ERROR_AUTH
+		result.Message = "Email or Password wrong"
+		c.JSON(result.Code, gin.H{
+			"res": result,
+		})
 	} else {
-		result.Message = "login field"
-		result.Code = http.StatusOK
-		c.HTML(result.Code, "index.tmpl", gin.H{
-			"massage": result.Message,
+		token, err := utils.GenerateToken(u.Email, u.Password)
+		if err != nil {
+			result.Code = e.ERROR_AUTH_CHECK_TOKEN_FAIL
+			result.Message = "Generate token error"
+			c.JSON(result.Code, gin.H{
+				"result": result,
+			})
+		}
+
+		cache.Set(user.Email, token, 1000)
+
+		result.Message = "login success"
+		result.Data = token
+		result.Code = e.SUCCESS
+		c.JSON(result.Code, gin.H{
+			"result": result,
 		})
 	}
 }
@@ -167,8 +143,7 @@ func useProfileUpdate(c *gin.Context) {
 	u, _ := user.QueryByEmail()
 
 	c.HTML(0, "userprofile.tmpl", gin.H{
-		"token": token,
-		"user":  u,
+		"user": u,
 	})
 
 }
