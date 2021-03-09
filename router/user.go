@@ -19,26 +19,26 @@ func CreateJwt(c *gin.Context) {
 	}
 	err := c.Bind(&user)
 	if err != nil {
-		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
+		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "", "")
 		return
 	}
 	u, err := user.QueryByEmail()
 	if err != nil {
-		resp.Response(http.StatusBadRequest, "Cannot find email", "index.tmpl", "", "")
+		resp.Response(http.StatusBadRequest, "Cannot find email", "index.tmpl", "", "", "")
 		return
 	}
 
 	if u.Password == user.Password {
 		token, err := utils.GenerateToken(u.Email, u.Password)
 		if err != nil {
-			resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
+			resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "", "")
 		}
 
 		cache.Set(user.Email, token, 1000)
-		resp.Response(http.StatusOK, "Login success", "userprofile.tmpl", "", u)
+		resp.Response(http.StatusOK, "Login success", "userprofile.tmpl", "", token, u)
 
 	} else {
-		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "Password or Email has wrong", "")
+		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "Password or Email has wrong", "", "")
 	}
 }
 
@@ -46,18 +46,18 @@ func userRegister(c *gin.Context) {
 	var user model.User
 	resp := Gin{c}
 	if err := c.ShouldBind(&user); err != nil {
-		resp.Response(http.StatusBadRequest, "input error", "register.tmpl", "", "")
+		resp.Response(http.StatusBadRequest, "input error", "register.tmpl", "", "", "")
 	}
 
 	passwordAgain := c.PostForm("passwordAgain")
 	if passwordAgain != user.Password {
-		resp.Response(http.StatusBadRequest, "the password you input are different", "register.tmpl", "", "")
+		resp.Response(http.StatusBadRequest, "the password you input are different", "register.tmpl", "", "", "")
 	}
 
 	_, err := user.Save()
 
 	if err != nil {
-		resp.Response(http.StatusBadRequest, "This email has been register, want to login in?", "index.tmpl", "", "")
+		resp.Response(http.StatusBadRequest, "This email has been register, want to login in?", "index.tmpl", "", "", "")
 	}
 
 	c.Redirect(http.StatusMovedPermanently, "/")
@@ -162,5 +162,5 @@ func test(c *gin.Context) {
 	password := c.PostForm("password")
 
 	fmt.Printf("email: %s -> password: %s", email, password)
-	resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
+	resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "", "")
 }

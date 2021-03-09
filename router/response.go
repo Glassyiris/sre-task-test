@@ -9,11 +9,12 @@ type Gin struct {
 }
 
 // Response setting gin.JSON
-func (g *Gin) Response(httpCode int, msg, tpl, next string, data interface{}) {
+func (g *Gin) Response(httpCode int, msg, tpl, next, token string, data interface{}) {
 	g.C.HTML(httpCode, tpl, gin.H{
-		"data": data,
-		"msg":  msg,
-		"next": next,
+		"data":  data,
+		"msg":   msg,
+		"next":  next,
+		"token": token,
 	})
 	return
 }
