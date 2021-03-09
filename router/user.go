@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"task-test/cache"
-	e "task-test/config"
 	"task-test/logger"
 	"task-test/model"
 	"task-test/utils"
@@ -18,57 +17,47 @@ func CreateJwt(c *gin.Context) {
 	resp := Gin{
 		c,
 	}
-	err := c.BindJSON(&user)
+	err := c.Bind(&user)
 	if err != nil {
-		resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "input error", "")
+		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
+		return
 	}
 	u, err := user.QueryByEmail()
 	if err != nil {
-		resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "Can't found email", "")
-	} else {
+		resp.Response(http.StatusBadRequest, "Cannot find email", "index.tmpl", "", "")
+		return
+	}
+
+	if u.Password == user.Password {
 		token, err := utils.GenerateToken(u.Email, u.Password)
 		if err != nil {
-			resp.Response(http.StatusBadRequest, e.ERROR_AUTH, "Email or password wrong", "")
+			resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
 		}
 
 		cache.Set(user.Email, token, 1000)
-		resp.Response(http.StatusOK, e.SUCCESS, "Login Success", token)
+		resp.Response(http.StatusOK, "Login success", "userprofile.tmpl", "", u)
 
+	} else {
+		resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "Password or Email has wrong", "")
 	}
 }
 
 func userRegister(c *gin.Context) {
 	var user model.User
-	result := &model.Result{
-		Code:    200,
-		Message: "login access",
-		Data:    nil,
-	}
+	resp := Gin{c}
 	if err := c.ShouldBind(&user); err != nil {
-		result.Code = http.StatusBadRequest
-		result.Message = "You input maybe have some mistakes"
-		c.HTML(result.Code, "register.tmpl", gin.H{
-			"massage": result.Message,
-		})
+		resp.Response(http.StatusBadRequest, "input error", "register.tmpl", "", "")
 	}
 
 	passwordAgain := c.PostForm("passwordAgain")
 	if passwordAgain != user.Password {
-		result.Code = http.StatusBadRequest
-		result.Message = "The two passwords entered are inconsistent"
-		c.HTML(result.Code, "register.tmpl", gin.H{
-			"massage": result.Message,
-		})
+		resp.Response(http.StatusBadRequest, "the password you input are different", "register.tmpl", "", "")
 	}
 
 	_, err := user.Save()
 
 	if err != nil {
-		result.Code = http.StatusBadRequest
-		result.Message = "This mailbox has already been registered"
-		c.HTML(result.Code, "register.tmpl", gin.H{
-			"massage": result.Message,
-		})
+		resp.Response(http.StatusBadRequest, "This email has been register, want to login in?", "index.tmpl", "", "")
 	}
 
 	c.Redirect(http.StatusMovedPermanently, "/")
@@ -173,5 +162,5 @@ func test(c *gin.Context) {
 	password := c.PostForm("password")
 
 	fmt.Printf("email: %s -> password: %s", email, password)
-	resp.Response(200, 200, "Ok", "err")
+	resp.Response(http.StatusBadRequest, "input error", "index.tmpl", "", "")
 }

@@ -14,7 +14,7 @@ func Auth() gin.HandlerFunc {
 		var data interface{}
 
 		code = 200
-		token := c.Query("token")
+		token := c.PostForm("token")
 		if token == "" {
 			code = e.INVALID_PARAMS
 		} else {
